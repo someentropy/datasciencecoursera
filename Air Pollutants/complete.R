@@ -1,17 +1,25 @@
 complete <- function(directory, id = 1:332) {
-  ####################################
-  # Validate & Set Mask
-  ####################################
-  pollutantFiles <- list.files(directory, full.names = TRUE)[id]
+
+  # Get file names
+  caseFiles <- list.files(directory, full.names = TRUE)[id]
+
+  # Frame size is equal to number of values in id
+  tableRows <- length(id)
   
-  ## 'id' is an integer vector indicating the monitor ID numbers
-  ## to be used
+  # Declare data frame schema
+  completeDf <- data.frame(id = integer(tableRows), nobs = integer(tableRows), stringsAsFactors = FALSE)
   
-  ## Return a data frame of the form:
-  ## id nobs
-  ## 1  117
-  ## 2  1041
-  ## ...
-  ## where 'id' is the monitor ID number and 'nobs' is the
-  ## number of complete cases
+  # Independant loop counter
+  loopCounter <- 1
+  
+  # Populate data frame
+  for (i in id) {
+    completeDf$id[loopCounter] <- i
+    completeDf$nobs[loopCounter] <- nrow(read.csv(caseFiles[loopCounter])[complete.cases(read.csv(caseFiles[loopCounter])), ])
+    loopCounter <- loopCounter +1
+  }
+  
+  # Return data frame
+  completeDf
 }
+
